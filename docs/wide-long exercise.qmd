@@ -1,0 +1,47 @@
+---
+title: "wide-long exercise"
+author: "Danyili Hong"
+format:
+  html:
+    embed-resources: true
+    code-tools: true
+    code-fold: true
+---
+
+```{python}
+import altair as alt
+import pandas as pd
+
+# Increase the maximum number of rows allowed
+alt.data_transformers.enable('json')
+alt.data_transformers.options['json'] = {'large_min_rows': None}
+
+jobs_url = "https://cdn.jsdelivr.net/npm/vega-datasets@2.8.0/data/jobs.json"
+jobs = pd.read_json(jobs_url)
+print(jobs[0:4])
+
+```
+
+```{python}
+import altair as alt
+import pandas as pd
+
+jobs_url = "https://cdn.jsdelivr.net/npm/vega-datasets@2.8.0/data/jobs.json"
+jobs = pd.read_json(jobs_url)
+
+
+scatter_plot = alt.Chart(jobs).transform_fold(
+  ['job', 'sex', 'year', 'perc'], as_ = ['occupation', 'sex', 'percentage']
+).mark_line(point = True).encode(
+  alt.X(field = "year", type = "quantitative",
+        sort = ['men', 'women', '1950', '2000', 'Accoutant', 'Auditor']),
+        alt.Y(field = "percentage", type = "quantitative"),
+        alt.color(field = "sex", type = "nominal")
+)
+
+scatter_plot.properties(width = 600, height = 150)
+scatter_plot
+
+
+```
+
