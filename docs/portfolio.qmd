@@ -1,0 +1,194 @@
+---
+title: "portfolio"
+author: "Danyili Hong"
+format:
+  html:
+    embed-resources: true
+    code-tools: true
+    code-fold: true
+---
+
+1.
+(a)
+I like Ryan Klein's Comparing Twins because I can see all of the comparisons between twins at one glance. Very simple and easy to read.
+
+(b)
+I don't really like Aaron Toth's Comparing Kits. There are so many circles that overlapped on each other which makes it hard to tell what individual represents. Also for the graph, I don't really understand what is it trying to tell me. It's hard to understand. 
+
+(c)
+```{python}
+import pandas as pd
+import altair as alt
+alt.data_transformers.enable("vegafusion")
+
+url = "https://calvin-data304.netlify.app/data/twins-genetics-long.csv"
+url2 = "https://calvin-data304.netlify.app/data/twins-genetics-wide.csv"
+
+twins = pd.read_csv(url)
+kits = pd.read_csv(url2)
+print(twins.head())
+print(kits.head())
+```
+
+```{python}
+import altair as alt
+
+alt.Chart(twins).mark_bar().encode(
+    x=alt.X("twin:N", title="Twin", scale=alt.Scale(padding=0.5)),
+    y=alt.Y("genetic share:Q", title="Genetic Share"),
+    color=alt.Color("kit:N", title="Kit"),
+    xOffset="kit:N"
+).properties(
+    title="Scores of each kit is very similar to each other",
+    width=600,
+    height=300
+).configure_view(
+    stroke='transparent'
+)
+
+
+
+```
+
+```{python}
+import altair as alt
+
+alt.Chart(kits).mark_circle(size=100).encode(
+    x=alt.X("MyHeritage:Q", title="MyHeritage"),
+    y=alt.Y("23andMe:Q", title="23 and Me"),
+    color=alt.Color("region:N", title="Region")
+).properties(
+    title="The ratio between 23andMe and MyHeritage is almost 1",
+    width=400,
+    height=300
+).configure_view(
+    stroke='transparent'
+)
+
+
+
+```
+
+I have compared both twins and kits which shows that there isn't big difference between different kinds of kits. 
+
+2.
+```{python}
+import pandas as pd
+import altair as alt
+alt.data_transformers.enable("vegafusion")
+
+url3 = "https://calvin-data304.netlify.app/data/swd-lets-practice-ex-5-03.csv"
+
+touchpoints = pd.read_csv(url3)
+print(touchpoints.head())
+```
+
+```{python}
+touchpoints[['year', 'month']] = touchpoints['Date'].str.split('-', expand=True)
+touchpoints['year-month'] = touchpoints['year'] + '-' + touchpoints['month']
+```
+
+
+```{python}
+chart3 = alt.Chart(touchpoints).transform_fold(
+    ['Phone Touchpoints', 'Chat Touchpoints', 'Email Touchpoints'], as_=["touchpoint type", "perc"]
+).mark_bar().encode(
+    alt.X('date:T',
+          sort=['Phone Touchpoints', 'Chat Touchpoints', 'Email Touchpoints'],
+          axis=alt.Axis(labelAngle=0, format='%Y-%m')  # set the date format
+          ),  # sort!
+    alt.Y(field="perc", type="quantitative"),
+    alt.Color(field="touchpoint type", type="nominal")
+).transform_calculate(
+    date='datetime(datum.year, datum.month)'
+)
+
+chart3.properties(title="Total Touchpoints has decreased drastically",width=600, height=150)
+```
+
+3.
+```{python}
+import pandas as pd
+import altair as alt
+alt.data_transformers.enable("vegafusion")
+
+url4 = "https://danyili-hong.github.io/data304/Tanzania%20dataset.csv"
+
+tanzania = pd.read_csv(url4)
+print(tanzania.head())
+```
+
+```{python}
+import pandas as pd
+import altair as alt
+
+tanzania[['year', 'year']] = tanzania['year'].str.split('-', expand=True)
+tanzania['year-year'] = tanzania['year'] + '-' + tanzania['year']
+
+line_chart = alt.Chart(tanzania).transform_fold(
+    ['fertility rate', 'contraception', 'unmet'], as_=['measure', 'value']
+).mark_line(point=True).encode(
+    x=alt.X('year:T', title='DHS Survey Year'),
+    y=alt.Y('value:Q', title='Value'),
+    color='measure:N'
+).transform_calculate(
+    date='datetime(datum.year,datum.year)'
+).properties(
+    title="A better contraception lowers down the fertility rate and the unmet need",
+    width=400,
+    height=300)
+
+line_chart
+```
+One thing I found according to the visualization is as contraception goes up, both the fertility rate and the unmet need for family planning goes down. Women are giving less birth when people are being more careful about contraception. 
+
+4.
+```{python}
+import pandas as pd
+import altair as alt
+
+url5 = "https://danyili-hong.github.io/data304/Popular_Spotify_Songs.csv"
+
+spotify = pd.read_csv(url5, encoding='ISO-8859-1')
+print(spotify.head())
+```
+```{python}
+scatter_plot = alt.Chart(spotify).mark_circle().encode(
+    alt.X('liveness_%:Q'),
+    alt.Y('in_spotify_playlists:Q').scale(zero=False),
+    size='bpm:Q',
+    color='mode:N',
+    tooltip=['track_name:N', 'artist(s)_name:N', 'streams:Q', 'liveness%:Q', 'bpm:Q']
+).properties(
+    title="The mode(major or minor) of the song doesn't decide its liveness",
+    width=600,
+    height=400
+)
+
+scatter_plot
+```
+I have chose the dataset of popular songs in spotify. I wanted to see if there is association between the liveness of the song and the mode(major or minor) of the song. There isn't obvious association between those two variables. I was also surprised that people are more likely to listen to the songs that are calm. I have tried line charts and also switched different variables. 
+
+5.
+(a) I have used color, size, and tooltip in my spotify visualization.
+(b) I was going to use facet for my HW3 but I ended up using Offset
+(c) I don't think I have used layer in any of my graphs
+(d) I also didn't use concatenation
+(e) I have use scale(zero=False) in a few places
+(f) I have used tooltips in my last graph
+
+6.
+(a) I have used transform_calculate, I don't know if we have learned it before but this is pretty new and fancy to me.
+https://altair-viz.github.io/user_guide/transform/calculate.html
+
+I forgot how to let the graph show color and size at the same time, and I looked at this example that helped me solve the problem.
+https://altair-viz.github.io/gallery/natural_disasters.html
+
+(b)
+Knaflic, Cole Nussbaumer, and Cathy Madden. 2020. Storytelling with Data : Let’s Practice! Hoboken, New Jersey: John Wiley & Sons, Inc, p55
+It talked about how to improve our tables before we start coding. I was also convinced by professor pruim of how important it is to make tables before we actually start coding. 
+
+Knaflic, Cole Nussbaumer, and Cathy Madden. 2020. Storytelling with Data : Let’s Practice! Hoboken, New Jersey: John Wiley & Sons, Inc, p154
+This helped me how to make my graph attention grabbing. I chose relatively shiny colors and bright colors to demostrate my graph. 
+
+
